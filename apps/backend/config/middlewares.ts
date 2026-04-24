@@ -11,6 +11,9 @@ const config: Core.Config.Middlewares = [
   'strapi::session',
   'strapi::favicon',
   'strapi::public',
+  // CSRF для cookie-пути на /auth/refresh и /auth/logout. Должен идти
+  // после strapi::body, чтобы успели спарситься куки и заголовки.
+  'global::csrf-cookie-origin',
 ];
 
 export default config;

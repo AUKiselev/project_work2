@@ -1,20 +1,40 @@
-// import type { Core } from '@strapi/strapi';
+import type { Core } from '@strapi/strapi';
+
+const SESSION_ACTIONS = [
+  'api::session.session.list',
+  'api::session.session.revoke',
+  'api::session.session.revokeOthers',
+] as const;
+
+/**
+ * Идемпотентно выдаёт Authenticated-роли разрешения на действия
+ * /api/auth/sessions/*. Без этих записей в users-permissions strategy
+ * вернёт 401/403 даже при валидном access-токене.
+ */
+const grantSessionPermissionsToAuthenticated = async (strapi: Core.Strapi) => {
+  const role: any = await strapi.db
+    .query('plugin::users-permissions.role')
+    .findOne({ where: { type: 'authenticated' } });
+  if (!role) {
+    strapi.log.warn('users-permissions: authenticated role not found, skipping session permissions');
+    return;
+  }
+  for (const action of SESSION_ACTIONS) {
+    const existing = await strapi.db
+      .query('plugin::users-permissions.permission')
+      .findOne({ where: { role: role.id, action } });
+    if (existing) continue;
+    await strapi.db
+      .query('plugin::users-permissions.permission')
+      .create({ data: { role: role.id, action } });
+    strapi.log.info(`users-permissions: granted ${action} to authenticated role`);
+  }
+};
 
 export default {
-  /**
-   * An asynchronous register function that runs before
-   * your application is initialized.
-   *
-   * This gives you an opportunity to extend code.
-   */
   register(/* { strapi }: { strapi: Core.Strapi } */) {},
 
-  /**
-   * An asynchronous bootstrap function that runs before
-   * your application gets started.
-   *
-   * This gives you an opportunity to set up your data model,
-   * run jobs, or perform some special logic.
-   */
-  bootstrap(/* { strapi }: { strapi: Core.Strapi } */) {},
+  async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    await grantSessionPermissionsToAuthenticated(strapi);
+  },
 };

@@ -1,0 +1,60 @@
+{
+  "kind": "collectionType",
+  "collectionName": "sessions",
+  "info": {
+    "singularName": "session",
+    "pluralName": "sessions",
+    "displayName": "Session",
+    "description": "Sidecar to users-permissions SessionManager. Stores a queryable record per (user, device) for the 'manage devices' UX. Correlation key is (user, deviceId, revokedAt IS NULL); sessionId is the current pointer and rotates with refresh."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": true
+    },
+    "content-type-builder": {
+      "visible": false
+    }
+  },
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "required": true
+    },
+    "deviceId": {
+      "type": "string",
+      "required": true,
+      "maxLength": 128
+    },
+    "sessionId": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "userAgent": {
+      "type": "text"
+    },
+    "ipAddress": {
+      "type": "string",
+      "maxLength": 64
+    },
+    "platform": {
+      "type": "enumeration",
+      "enum": ["web", "ios", "android", "unknown"],
+      "default": "unknown"
+    },
+    "lastActiveAt": {
+      "type": "datetime"
+    },
+    "revokedAt": {
+      "type": "datetime"
+    }
+  }
+}
