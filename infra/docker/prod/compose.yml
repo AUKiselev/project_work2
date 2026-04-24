@@ -34,7 +34,7 @@ services:
   backend:
     build:
       context: ./apps/backend
-      dockerfile: Dockerfile
+      dockerfile: ../../infra/docker/prod/backend.Dockerfile
     restart: always
     labels:
       - traefik.http.routers.backend.rule=Host(`${API_DOMAIN}`)
@@ -44,7 +44,7 @@ services:
   frontend:
     build:
       context: ./apps/frontend
-      dockerfile: Dockerfile
+      dockerfile: ../../infra/docker/prod/frontend.Dockerfile
     restart: always
     labels:
       - traefik.http.routers.frontend.rule=Host(`${APP_DOMAIN}`)

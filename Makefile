@@ -1,9 +1,9 @@
 # Короткие команды для запуска стека.
 # Все переменные берутся из корневого .env.
 
-COMPOSE       := docker compose --env-file .env
-DEV_FILES     := -f docker-compose.yml -f docker-compose.dev.yml
-PROD_FILES    := -f docker-compose.yml -f docker-compose.prod.yml
+COMPOSE       := docker compose --env-file .env --project-directory .
+DEV_FILES     := -f infra/docker/compose.base.yml -f infra/docker/dev/compose.yml
+PROD_FILES    := -f infra/docker/compose.base.yml -f infra/docker/prod/compose.yml
 
 .PHONY: help init dev prod down logs ps build restart-% sh-% clean
 

@@ -36,14 +36,21 @@
 .
 ├── .env                      единственный источник переменных (игнорируется git)
 ├── .env.example              шаблон со всеми переменными
-├── docker-compose.yml        база
-├── docker-compose.dev.yml    dev-оверрайд (hot reload, открытые порты)
-├── docker-compose.prod.yml   prod-оверрайд (Let's Encrypt, restart:always)
 ├── Makefile                  короткие команды
 ├── apps/
 │   ├── frontend/             Nuxt 4 + Capacitor
 │   └── backend/              Strapi 5
 └── infra/
+    ├── docker/
+    │   ├── compose.base.yml  база (сервисы, сети, тома)
+    │   ├── dev/
+    │   │   ├── compose.yml         dev-оверрайд (hot reload, открытые порты)
+    │   │   ├── frontend.Dockerfile
+    │   │   └── backend.Dockerfile
+    │   └── prod/
+    │       ├── compose.yml         prod-оверрайд (Let's Encrypt, restart:always)
+    │       ├── frontend.Dockerfile
+    │       └── backend.Dockerfile
     └── traefik/              статические и динамические конфиги
 ```
 
@@ -51,8 +58,8 @@
 
 Все переменные — в одном `.env` в корне. Docker Compose подгружает его и
 пробрасывает нужные значения в каждый сервис (см. `environment:` в
-`docker-compose.yml`). Публичные переменные Nuxt именуются с префиксом
-`NUXT_PUBLIC_*` и автоматически становятся доступны в браузере.
+`infra/docker/compose.base.yml`). Публичные переменные Nuxt именуются с
+префиксом `NUXT_PUBLIC_*` и автоматически становятся доступны в браузере.
 
 ## Быстрый старт
 

@@ -30,7 +30,7 @@ services:
   backend:
     build:
       context: ./apps/backend
-      dockerfile: Dockerfile.dev
+      dockerfile: ../../infra/docker/dev/backend.Dockerfile
     command: npm run develop
     volumes:
       - ./apps/backend:/opt/app
@@ -44,7 +44,7 @@ services:
   frontend:
     build:
       context: ./apps/frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: ../../infra/docker/dev/frontend.Dockerfile
     command: npm run dev -- --host 0.0.0.0
     volumes:
       - ./apps/frontend:/opt/app
