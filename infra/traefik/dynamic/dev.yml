@@ -1,0 +1,24 @@
+# Динамический конфиг Traefik для dev.
+# Здесь удобно держать middlewares и файловые роуты, не привязанные к контейнерам.
+
+http:
+  middlewares:
+    cors-dev:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        accessControlAllowOriginList:
+          - "http://app.localhost"
+          - "http://localhost:3000"
+          - "capacitor://localhost"
+          - "ionic://localhost"
+        accessControlAllowHeaders:
+          - "*"
+        accessControlAllowCredentials: true
+        accessControlMaxAge: 100
+        addVaryHeader: true

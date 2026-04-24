@@ -1,0 +1,57 @@
+# Dev-оверрайд: hot reload, порты наружу для отладки, открытый дашборд Traefik.
+# Запуск: make dev
+
+services:
+  traefik:
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
+      - --entrypoints.web.address=:80
+      - --log.level=INFO
+      - --accesslog=true
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./infra/traefik/dynamic:/etc/traefik/dynamic:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DOMAIN}`)
+      - traefik.http.routers.dashboard.service=api@internal
+      - traefik.http.routers.dashboard.entrypoints=web
+
+  postgres:
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile.dev
+    command: npm run develop
+    volumes:
+      - ./apps/backend:/opt/app
+      - /opt/app/node_modules
+    ports:
+      - "1337:1337"
+    labels:
+      - traefik.http.routers.backend.rule=Host(`${API_DOMAIN}`)
+      - traefik.http.routers.backend.entrypoints=web
+
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile.dev
+    command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./apps/frontend:/opt/app
+      - /opt/app/node_modules
+    ports:
+      - "3000:3000"
+      - "24678:24678" # Vite HMR
+    labels:
+      - traefik.http.routers.frontend.rule=Host(`${APP_DOMAIN}`)
+      - traefik.http.routers.frontend.entrypoints=web
