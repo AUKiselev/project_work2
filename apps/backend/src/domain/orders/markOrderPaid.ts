@@ -78,9 +78,23 @@ export const markOrderPaid = async (
     });
 
     if (order.promoCode) {
+      // Re-check внутри транзакции: между createOrder и markOrderPaid
+      // мог произойти параллельный paid того же промо. Атомарно читаем
+      // текущий usedCount и инкрементируем.
+      // TODO: полное решение — SELECT FOR UPDATE или Redis sequence
+      // (сейчас остаётся узкое окно гонки при высоком concurrency).
+      const fresh: any = await strapi.db.query('api::promo-code.promo-code').findOne({
+        where: { id: order.promoCode.id },
+      });
+      if (fresh?.maxUses != null && (fresh.usedCount || 0) >= fresh.maxUses) {
+        throw new OrderValidationError(
+          409,
+          'promo usage limit reached during payment',
+        );
+      }
       await strapi.db.query('api::promo-code.promo-code').update({
         where: { id: order.promoCode.id },
-        data: { usedCount: (order.promoCode.usedCount || 0) + 1 },
+        data: { usedCount: (fresh?.usedCount || 0) + 1 },
       });
     }
 
