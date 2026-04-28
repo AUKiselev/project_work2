@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_attendee_attendees",
+  "info": {
+    "displayName": "Attendee",
+    "description": "Анкета посетителя на конкретный билет"
+  },
+  "options": {},
+  "attributes": {
+    "fullName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 200
+    },
+    "email": { "type": "email" },
+    "phone": { "type": "string", "maxLength": 32 },
+    "extra": { "type": "json" }
+  }
+}
