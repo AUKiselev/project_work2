@@ -1,0 +1,19 @@
+{
+  "kind": "collectionType",
+  "collectionName": "speaker_applications",
+  "info": {
+    "singularName": "speaker-application",
+    "pluralName": "speaker-applications",
+    "displayName": "Speaker Application",
+    "description": "Заявка «стать спикером»"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "fullName": { "type": "string", "required": true, "maxLength": 200 },
+    "email": { "type": "email", "required": true },
+    "topic": { "type": "string", "maxLength": 300 },
+    "description": { "type": "text" },
+    "status": { "type": "enumeration", "enum": ["new", "reviewing", "accepted", "rejected"], "default": "new", "required": true },
+    "user": { "type": "relation", "relation": "manyToOne", "target": "plugin::users-permissions.user" }
+  }
+}
