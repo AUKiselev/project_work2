@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "venues",
+  "info": {
+    "singularName": "venue",
+    "pluralName": "venues",
+    "displayName": "Venue",
+    "description": "Площадка проведения мероприятия"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "name": { "type": "string", "required": true, "maxLength": 200 },
+    "address": { "type": "string", "maxLength": 500 },
+    "lat": { "type": "decimal" },
+    "lng": { "type": "decimal" },
+    "mapEmbed": { "type": "string", "maxLength": 500 }
+  }
+}
