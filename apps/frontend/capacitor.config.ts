@@ -7,7 +7,8 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: process.env.CAP_APP_ID || 'com.example.projectwork2',
   appName: process.env.CAP_APP_NAME || 'ProjectWork2',
-  webDir: 'dist',
+  // Nuxt generate -> .output/public — это и есть webDir Capacitor.
+  webDir: '.output/public',
   server: {
     // В dev — указать LAN IP машины с `nuxt dev` (CAP_SERVER_URL),
     // тогда устройство будет грузить страницы с горячей перезагрузкой.

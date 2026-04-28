@@ -12,7 +12,7 @@
  */
 import { defineStore } from 'pinia';
 import { useDeviceId } from '~/composables/useDeviceId';
-import { storage } from '~/utils/storage';
+import { secureStorage } from '~/utils/storage';
 import { isNative, platformName } from '~/utils/platform';
 
 const REFRESH_KEY = 'pw2.refreshToken';
@@ -66,17 +66,17 @@ export const useAuthStore = defineStore('auth', {
 
     async _saveRefresh(token: string | undefined) {
       if (!token) return;
-      if (isNative()) await storage.set(REFRESH_KEY, token);
-      // На web сервер кладёт refresh в HttpOnly-cookie; в JS его не видно.
+      // На native — Keychain/Keystore через secureStorage. На web сервер
+      // кладёт refresh в HttpOnly-cookie; в JS его не видно (no-op).
+      await secureStorage.set(REFRESH_KEY, token);
     },
 
     async _readRefresh(): Promise<string | null> {
-      if (!isNative()) return null;
-      return storage.get(REFRESH_KEY);
+      return secureStorage.get(REFRESH_KEY);
     },
 
     async _clearRefresh() {
-      if (isNative()) await storage.remove(REFRESH_KEY);
+      await secureStorage.remove(REFRESH_KEY);
     },
 
     async _post<T>(path: string, body: Record<string, any>, extraHeaders: Record<string, string> = {}): Promise<T> {

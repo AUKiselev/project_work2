@@ -26,10 +26,11 @@ export default defineNuxtConfig({
     },
   },
 
-  // PWA-манифест и сервис-воркер. Иконки 192/512 — плейсхолдеры в /public,
-  // финальные генерируются отдельным шагом (assets-generator) — см. README.
+  // PWA-манифест и сервис-воркер. Иконки сгенерированы из public/logo.svg
+  // через `npx pwa-assets-generator` (см. pwa-assets.config.ts).
   pwa: {
     registerType: 'autoUpdate',
+    includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png'],
     manifest: {
       name: 'ProjectWork2',
       short_name: 'PW2',
@@ -40,16 +41,25 @@ export default defineNuxtConfig({
       start_url: '/',
       icons: [
         {
-          src: '/icon-192.png',
-          sizes: '192x192',
+          src: '/pwa-64x64.png',
+          sizes: '64x64',
           type: 'image/png',
-          purpose: 'any maskable',
         },
         {
-          src: '/icon-512.png',
+          src: '/pwa-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: '/pwa-512x512.png',
           sizes: '512x512',
           type: 'image/png',
-          purpose: 'any maskable',
+        },
+        {
+          src: '/maskable-icon-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'maskable',
         },
       ],
     },
