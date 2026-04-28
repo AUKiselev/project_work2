@@ -24,6 +24,19 @@ export const markOrderPaid = async (
       throw new OrderValidationError(409, `order is ${order.paymentStatus}, expected pending`);
     }
 
+    // Re-check: event ещё активен (не cancelled/archived) на момент оплаты.
+    // Между createOrder и markOrderPaid админ мог снять мероприятие.
+    for (const item of order.items || []) {
+      const event = item.tier?.event;
+      if (!event) continue;
+      if (event.status === 'cancelled' || event.status === 'archived') {
+        throw new OrderValidationError(
+          409,
+          `event is ${event.status}, cannot issue tickets`,
+        );
+      }
+    }
+
     const draft: any[] = order.draftAttendees || [];
     let attendeeIdx = 0;
     const createdTickets: any[] = [];
