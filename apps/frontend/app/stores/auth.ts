@@ -191,6 +191,16 @@ export const useAuthStore = defineStore('auth', {
       this.user = null;
       this.accessToken = null;
       await this._clearRefresh();
+      // Сбрасываем cross-page состояние, чтобы данные предыдущего user'а
+      // не утекли к следующему вошедшему на этом устройстве.
+      try {
+        const { useCartStore } = await import('~/stores/cart');
+        const { useFavoritesStore } = await import('~/stores/favorites');
+        useCartStore().reset();
+        useFavoritesStore().reset();
+      } catch {
+        /* стор может быть не инициализирован — это нормально */
+      }
     },
 
     /**
