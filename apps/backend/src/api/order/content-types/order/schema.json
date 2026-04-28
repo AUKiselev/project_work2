@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "Order",
+    "description": "Заказ (одна транзакция покупки билетов)"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "number": { "type": "string", "required": true, "unique": true, "maxLength": 64 },
+    "subtotal": { "type": "integer", "required": true, "min": 0 },
+    "discount": { "type": "integer", "default": 0, "min": 0 },
+    "total": { "type": "integer", "required": true, "min": 0 },
+    "currency": { "type": "enumeration", "enum": ["RUB"], "default": "RUB", "required": true },
+    "paymentMethod": { "type": "enumeration", "enum": ["card", "sbp", "invoice"], "required": true },
+    "paymentStatus": { "type": "enumeration", "enum": ["pending", "paid", "failed", "refunded"], "default": "pending", "required": true },
+    "paymentProviderId": { "type": "string", "private": true, "maxLength": 200 },
+    "personalDataConsentAt": { "type": "datetime", "required": true },
+    "draftAttendees": { "type": "json", "private": true },
+    "user": { "type": "relation", "relation": "manyToOne", "target": "plugin::users-permissions.user" },
+    "items": { "type": "relation", "relation": "oneToMany", "target": "api::order-item.order-item", "mappedBy": "order" },
+    "tickets": { "type": "relation", "relation": "oneToMany", "target": "api::ticket.ticket", "mappedBy": "order" },
+    "promoCode": { "type": "relation", "relation": "manyToOne", "target": "api::promo-code.promo-code" }
+  }
+}
