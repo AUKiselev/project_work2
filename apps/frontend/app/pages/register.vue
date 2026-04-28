@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
 
-definePageMeta({ middleware: 'guest' });
+definePageMeta({ middleware: 'guest', layout: 'auth' });
 
 const auth = useAuthStore();
 const router = useRouter();
