@@ -1,0 +1,20 @@
+{
+  "kind": "collectionType",
+  "collectionName": "banners",
+  "info": {
+    "singularName": "banner",
+    "pluralName": "banners",
+    "displayName": "Banner",
+    "description": "Баннер для рекламного слайдера на главной"
+  },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "title": { "type": "string", "required": true, "maxLength": 200 },
+    "image": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
+    "url": { "type": "string", "maxLength": 500 },
+    "priority": { "type": "integer", "default": 0 },
+    "activeFrom": { "type": "datetime" },
+    "activeUntil": { "type": "datetime" },
+    "event": { "type": "relation", "relation": "manyToOne", "target": "api::event.event" }
+  }
+}
