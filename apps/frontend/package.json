@@ -12,7 +12,10 @@
     "cap:add:android": "cap add android",
     "cap:sync": "npm run generate && cap sync",
     "cap:open:ios": "cap open ios",
-    "cap:open:android": "cap open android"
+    "cap:open:android": "cap open android",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@aparajita/capacitor-secure-storage": "^8.0.0",
@@ -36,7 +39,10 @@
   "devDependencies": {
     "@types/uuid": "^10.0.0",
     "@vite-pwa/assets-generator": "^1.0.2",
-    "typescript": "^6.0.3"
+    "@vue/test-utils": "^2.4.9",
+    "happy-dom": "^15.11.7",
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=22.0.0 <25.0.0"
