@@ -1,5 +1,7 @@
 import type { Core } from '@strapi/strapi';
+import request from 'supertest';
 import { setupStrapi, teardownStrapi } from '../helpers/strapi';
+import { issueAccessToken } from '../helpers/auth';
 import { createOrder } from '../../src/domain/orders/createOrder';
 import { markOrderPaid } from '../../src/domain/orders/markOrderPaid';
 
@@ -169,5 +171,31 @@ describe('Order flow', () => {
     await expect(
       markOrderPaid(strapi, { orderId: order.id, userId: 999999 }),
     ).rejects.toMatchObject({ httpStatus: 404 });
+  });
+
+  it('controller mark-paid возвращает 404 в NODE_ENV=production', async () => {
+    const { event, tier, user } = await setupFixtures();
+    const order: any = await createOrder(strapi, {
+      userId: user.id,
+      eventId: event.id,
+      items: [{ tierId: tier.id, quantity: 1 }],
+      paymentMethod: 'card',
+      personalDataConsent: true,
+      attendees: [{ fullName: 'A' }],
+    });
+
+    const token = await issueAccessToken(strapi, user.id);
+
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    try {
+      const res = await request(strapi.server.httpServer)
+        .post(`/api/orders/${order.id}/mark-paid`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({});
+      expect(res.status).toBe(404);
+    } finally {
+      process.env.NODE_ENV = originalEnv;
+    }
   });
 });
