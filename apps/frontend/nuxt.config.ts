@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@vueuse/nuxt',
     '@vite-pwa/nuxt',
+    '@nuxt/ui',
   ],
 
   // Tailwind v4 — единственный CSS-entrypoint импортирует @tailwindcss.
@@ -23,6 +24,7 @@ export default defineNuxtConfig({
       apiBase: '',
       // Имя refresh-cookie на бэке (зеркалит UP_REFRESH_COOKIE_NAME).
       refreshCookieName: 'strapi_up_refresh',
+      appEnv: '',
     },
   },
 
