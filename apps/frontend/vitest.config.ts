@@ -4,6 +4,13 @@ import { fileURLToPath } from 'node:url';
 export default defineConfig({
   test: {
     environment: 'happy-dom',
+    environmentOptions: {
+      happyDOM: {
+        settings: {
+          disableJavaScriptEvaluation: true,
+        },
+      },
+    },
     globals: true,
     include: ['tests/unit/**/*.{spec,test}.ts'],
     coverage: { provider: 'v8', reporter: ['text', 'html'] },
