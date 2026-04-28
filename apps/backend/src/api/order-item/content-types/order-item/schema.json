@@ -1,0 +1,17 @@
+{
+  "kind": "collectionType",
+  "collectionName": "order_items",
+  "info": {
+    "singularName": "order-item",
+    "pluralName": "order-items",
+    "displayName": "Order Item",
+    "description": "Позиция заказа (категория × количество)"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "quantity": { "type": "integer", "required": true, "min": 1 },
+    "unitPrice": { "type": "integer", "required": true, "min": 0 },
+    "order": { "type": "relation", "relation": "manyToOne", "target": "api::order.order", "inversedBy": "items" },
+    "tier": { "type": "relation", "relation": "manyToOne", "target": "api::ticket-tier.ticket-tier" }
+  }
+}
