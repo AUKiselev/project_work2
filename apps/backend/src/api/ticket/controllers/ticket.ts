@@ -45,7 +45,9 @@ export default factories.createCoreController('api::ticket.ticket', ({ strapi })
         status: ticket.status,
         usedAt: ticket.usedAt,
         qrPayload: ticket.qrPayload,
-        attendee: ticket.attendee,
+        attendee: ticket.attendee
+          ? { fullName: ticket.attendee.fullName }
+          : null,
         event: ticket.event,
         tier: ticket.tier,
       },
