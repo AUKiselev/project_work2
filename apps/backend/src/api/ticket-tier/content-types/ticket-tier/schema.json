@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ticket_tiers",
+  "info": {
+    "singularName": "ticket-tier",
+    "pluralName": "ticket-tiers",
+    "displayName": "Ticket Tier",
+    "description": "Категория билета внутри мероприятия"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "name": { "type": "string", "required": true, "maxLength": 200 },
+    "description": { "type": "text" },
+    "includes": { "type": "richtext" },
+    "price": { "type": "integer", "required": true, "min": 0 },
+    "currency": {
+      "type": "enumeration",
+      "enum": ["RUB"],
+      "default": "RUB",
+      "required": true
+    },
+    "sortOrder": { "type": "integer", "default": 0 },
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event",
+      "inversedBy": "tiers"
+    }
+  }
+}

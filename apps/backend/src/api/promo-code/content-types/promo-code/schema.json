@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "promo_codes",
+  "info": {
+    "singularName": "promo-code",
+    "pluralName": "promo-codes",
+    "displayName": "Promo Code",
+    "description": "Промокод / скидка"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "code": { "type": "string", "required": true, "unique": true, "maxLength": 64 },
+    "discountType": { "type": "enumeration", "enum": ["percent", "fixed"], "required": true },
+    "discountValue": { "type": "integer", "required": true, "min": 0 },
+    "validFrom": { "type": "datetime" },
+    "validUntil": { "type": "datetime" },
+    "maxUses": { "type": "integer", "min": 1 },
+    "usedCount": { "type": "integer", "default": 0, "min": 0, "private": true },
+    "events": { "type": "relation", "relation": "manyToMany", "target": "api::event.event" }
+  }
+}

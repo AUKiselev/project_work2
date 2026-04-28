@@ -1,0 +1,71 @@
+{
+  "kind": "collectionType",
+  "collectionName": "events",
+  "info": {
+    "singularName": "event",
+    "pluralName": "events",
+    "displayName": "Event",
+    "description": "Мероприятие"
+  },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "slug": { "type": "uid", "targetField": "title" },
+    "title": { "type": "string", "required": true, "maxLength": 300 },
+    "shortDescription": { "type": "string", "maxLength": 500 },
+    "description": { "type": "richtext" },
+    "coverImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "gallery": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"]
+    },
+    "pastGallery": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"]
+    },
+    "startsAt": { "type": "datetime", "required": true },
+    "endsAt": { "type": "datetime" },
+    "timezone": { "type": "string", "default": "Europe/Moscow", "maxLength": 64 },
+    "capacity": { "type": "integer", "min": 0 },
+    "status": {
+      "type": "enumeration",
+      "enum": ["draft", "published", "cancelled", "archived"],
+      "default": "draft",
+      "required": true
+    },
+    "venue": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::venue.venue"
+    },
+    "organizer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::organizer.organizer",
+      "inversedBy": "events"
+    },
+    "speakers": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::speaker.speaker",
+      "inversedBy": "events"
+    },
+    "agenda": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::agenda-item.agenda-item",
+      "mappedBy": "event"
+    },
+    "tiers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::ticket-tier.ticket-tier",
+      "mappedBy": "event"
+    }
+  }
+}
