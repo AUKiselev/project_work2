@@ -31,8 +31,18 @@ const grantSessionPermissionsToAuthenticated = async (strapi: Core.Strapi) => {
   }
 };
 
+const assertRequiredEnv = () => {
+  if (!process.env.TICKET_QR_SECRET || process.env.TICKET_QR_SECRET.length < 16) {
+    throw new Error(
+      'TICKET_QR_SECRET env is required (min length 16). Set it in apps/backend/.env',
+    );
+  }
+};
+
 export default {
-  register(/* { strapi }: { strapi: Core.Strapi } */) {},
+  register() {
+    assertRequiredEnv();
+  },
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     await grantSessionPermissionsToAuthenticated(strapi);
