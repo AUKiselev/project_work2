@@ -5,7 +5,7 @@
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
-      <UNotifications />
+      <UToaster />
     </Body>
   </Html>
 </template>
