@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "manager_contact_requests",
+  "info": {
+    "singularName": "manager-contact-request",
+    "pluralName": "manager-contact-requests",
+    "displayName": "Manager Contact Request",
+    "description": "Обращение «связаться с менеджером»"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "subject": { "type": "string", "required": true, "maxLength": 300 },
+    "message": { "type": "text", "required": true },
+    "contactBack": { "type": "string", "maxLength": 200 },
+    "status": { "type": "enumeration", "enum": ["new", "processing", "done"], "default": "new", "required": true },
+    "user": { "type": "relation", "relation": "manyToOne", "target": "plugin::users-permissions.user" }
+  }
+}
