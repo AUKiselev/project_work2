@@ -8,6 +8,11 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
       jwt: {
         expiresIn: `${env.int('UP_ACCESS_TOKEN_LIFESPAN', 600)}s`,
       },
+      // Разрешаем клиенту слать deviceId/deviceName при регистрации,
+      // чтобы расширение могло сразу же завести сайдкар-строку Session.
+      register: {
+        allowedFields: ['deviceId', 'deviceName'],
+      },
       sessions: {
         // httpOnly: true заставит cookie-режим даже без заголовка. Оставляем
         // false — пусть клиент выбирает через `x-strapi-refresh-cookie: httpOnly`.

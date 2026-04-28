@@ -7,11 +7,32 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "cap:add:ios": "cap add ios",
+    "cap:add:android": "cap add android",
+    "cap:sync": "npm run generate && cap sync",
+    "cap:open:ios": "cap open ios",
+    "cap:open:android": "cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/cli": "^8.3.1",
+    "@capacitor/core": "^8.3.1",
+    "@capacitor/ios": "^8.3.1",
+    "@capacitor/preferences": "^8.0.1",
+    "@pinia/nuxt": "^0.11.3",
+    "@tailwindcss/vite": "^4.2.4",
+    "@vite-pwa/nuxt": "^1.1.1",
+    "@vueuse/core": "^14.2.1",
+    "@vueuse/nuxt": "^14.2.1",
     "nuxt": "^4.4.2",
+    "pinia": "^3.0.4",
+    "tailwindcss": "^4.2.4",
+    "uuid": "^14.0.0",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4"
+  },
+  "devDependencies": {
+    "@types/uuid": "^10.0.0"
   }
 }

@@ -77,6 +77,7 @@ export default (plugin: any) => {
   const originalCallback = plugin.controllers.auth.callback;
   const originalRefresh = plugin.controllers.auth.refresh;
   const originalLogout = plugin.controllers.auth.logout;
+  const originalRegister = plugin.controllers.auth.register;
 
   plugin.controllers.auth.callback = async function callback(ctx: any) {
     const strapi = (globalThis as any).strapi as Strapi;
@@ -188,6 +189,42 @@ export default (plugin: any) => {
       await getSidecar(strapi).markLogout(userId, deviceId);
     } catch (err) {
       strapi.log.error('sidecar markLogout failed', err as Error);
+    }
+  };
+
+  plugin.controllers.auth.register = async function register(ctx: any) {
+    const strapi = (globalThis as any).strapi as Strapi;
+    const mode = getMode(strapi);
+    const deviceId = extractDeviceId(ctx.request.body);
+    const deviceName = extractDeviceName(ctx.request.body);
+
+    // Если включён email-confirmation, register не выдаёт токены — всегда
+    // выполняем оригинал и выходим. Иначе валидируем deviceId.
+    if (mode === 'refresh' && !deviceId) {
+      return ctx.badRequest('Missing deviceId');
+    }
+
+    await originalRegister.call(this, ctx);
+
+    if (mode !== 'refresh') return;
+    if (!deviceId) return;
+    const body = ctx.body as any;
+    if (!body?.jwt || !body?.user?.id) return;
+
+    const sessionId = sessionIdFromAccessToken(strapi, body.jwt);
+    if (!sessionId) return;
+
+    const sidecar = getSidecar(strapi);
+    const meta = sidecar.extractDeviceMeta(ctx, deviceName);
+    try {
+      await sidecar.upsertByDevice({
+        userId: body.user.id,
+        deviceId,
+        sessionId,
+        meta,
+      });
+    } catch (err) {
+      strapi.log.error('sidecar upsertByDevice (register) failed', err as Error);
     }
   };
 

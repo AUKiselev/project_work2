@@ -88,25 +88,62 @@ NODE_ENV=production make prod
 
 ## Мобильная сборка
 
-1. В `apps/frontend`: `npm i -D @capacitor/cli && npm i @capacitor/core @capacitor/ios @capacitor/android`
-2. `npx cap init "$CAP_APP_NAME" "$CAP_APP_ID"` (значения из `.env`)
-3. Nuxt собрать статикой: `npm run generate` → `dist/`
-4. `npx cap add ios && npx cap add android`
-5. `npx cap sync`
-6. В `capacitor.config.ts` для dev выставить `server.url = CAP_SERVER_URL` (LAN IP
-   dev-сервера Nuxt), в prod — оставить пустым, будет использоваться бандл.
+Capacitor уже подключён (`apps/frontend/capacitor.config.ts` + пакеты
+@capacitor/core, @capacitor/cli, @capacitor/ios, @capacitor/android,
+@capacitor/preferences). Шаги:
 
-Оба мобильных клиента обращаются к тому же `api.<domain>` через HTTPS в проде.
+1. Один раз сгенерировать нативные проекты:
+   `cd apps/frontend && npm run cap:add:ios && npm run cap:add:android`
+2. Собрать статикой и синхронизировать: `npm run cap:sync`
+3. Открыть в нативной IDE: `npm run cap:open:ios` / `cap:open:android`
+
+Для dev с горячей перезагрузкой на устройстве — задать `CAP_SERVER_URL`
+в корневом `.env` (LAN IP машины, где запущен `nuxt dev`).
+
+⚠ refresh-токен на native сейчас лежит в `Capacitor Preferences` — это
+**не** secure storage. Для прода переехать на Keychain/Keystore
+(например, `@aparajita/capacitor-secure-storage`); точка замены —
+`apps/frontend/app/utils/storage.ts`.
+
+## PWA
+
+`@vite-pwa/nuxt` подключён, манифест в `nuxt.config.ts`. Иконки
+`/icon-192.png` и `/icon-512.png` нужно положить в `apps/frontend/public/`
+перед прод-сборкой (можно сгенерировать `@vite-pwa/assets-generator`
+из одного исходного svg/png).
+
+Оба мобильных клиента обращаются к тому же `api.<domain>` через HTTPS в
+проде. На login/register/refresh клиент шлёт стабильный per-install
+`deviceId` (UUID, лежит в Capacitor Preferences/localStorage); это ключ
+дедупа сессий на бэке.
+
+## Авторизация
+
+Реализована на refresh-токенах с поддержкой сессий устройств:
+
+- Бэк: `users-permissions` в `jwtManagement: 'refresh'` + сайдкар
+  `Session` (см. `apps/backend/src/api/session/`). Дедуп по `(user,
+  deviceId)`, partial unique index в Postgres, reuse-detection.
+- Фронт: Pinia-стор `useAuthStore` (`apps/frontend/app/stores/auth.ts`)
+  + плагин `$api` с авто-рефрешем на 401 в single-flight.
+- Web → refresh в HttpOnly+Secure-cookie (заголовок
+  `x-strapi-refresh-cookie: httpOnly`), access в памяти.
+- Mobile → refresh bearer в Capacitor Preferences (точка замены на
+  Keychain/Keystore — `app/utils/storage.ts`), access в памяти.
+- Управление сессиями: `/api/auth/sessions` (GET/DELETE/revoke-others),
+  UI в `apps/frontend/app/pages/sessions.vue`.
 
 ## Дальнейшие шаги
 
 - [ ] `make init` и заполнить секреты в `.env`
-- [ ] Сгенерировать Nuxt в `apps/frontend` (с compatibility version 4)
-- [ ] Сгенерировать Strapi в `apps/backend` с клиентом `postgres`
-- [ ] Добавить Capacitor во frontend (`npm i -D @capacitor/cli`)
 - [ ] Настроить DNS `A`-записи для `APP_DOMAIN` / `API_DOMAIN` / `TRAEFIK_DOMAIN`
       на prod-сервер (для Let's Encrypt)
-- [ ] Проверить `make dev` → `make prod` на тестовом домене
+- [ ] Сгенерировать иконки PWA (`@vite-pwa/assets-generator`) и положить
+      в `apps/frontend/public/`
+- [ ] Сгенерировать iOS/Android-обёртки (`npm run cap:add:ios|android`)
+      и опубликовать
+- [ ] Заменить `Capacitor Preferences` на secure storage для нативного
+      refresh-токена
 
 ## Команды
 
