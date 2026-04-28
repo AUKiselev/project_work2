@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "agenda_items",
+  "info": {
+    "singularName": "agenda-item",
+    "pluralName": "agenda-items",
+    "displayName": "Agenda Item",
+    "description": "Пункт программы мероприятия"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "startsAt": { "type": "datetime", "required": true },
+    "endsAt": { "type": "datetime" },
+    "title": { "type": "string", "required": true, "maxLength": 300 },
+    "description": { "type": "text" },
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event",
+      "inversedBy": "agenda"
+    },
+    "speakers": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::speaker.speaker"
+    }
+  }
+}
