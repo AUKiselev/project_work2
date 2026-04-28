@@ -15,7 +15,7 @@
     "upgrade:dry": "npx @strapi/upgrade latest --dry",
     "test": "jest",
     "test:unit": "jest --testPathPatterns=tests/unit",
-    "test:integration": "jest --testPathPatterns=tests/integration --runInBand"
+    "test:integration": "jest --testPathPatterns=tests/integration --runInBand --forceExit"
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.43.0",
@@ -28,11 +28,13 @@
     "styled-components": "^6.0.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/supertest": "^7.2.0",
+    "better-sqlite3": "^12.9.0",
     "jest": "^30.3.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.9",

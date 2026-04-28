@@ -42,7 +42,9 @@ export const markOrderPaid = async (
         attendeeIdx += 1;
 
         const number = generateTicketNumber();
-        const ticket: any = await strapi.db.query('api::ticket.ticket').create({
+        // Use entityService (not db.query) so the `attendee` component is
+        // persisted correctly — db.query bypasses Strapi's component layer.
+        const ticket: any = await strapi.entityService.create('api::ticket.ticket', {
           data: {
             number,
             qrPayload: 'pending',
