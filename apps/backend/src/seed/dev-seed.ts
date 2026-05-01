@@ -277,5 +277,126 @@ export async function seedDev(strapi: any): Promise<void> {
     strapi.log.info('seed: created promo-code "WELCOME10"');
   }
 
+  // ─── 8. Agenda Items ───────────────────────────────────────────────────────
+
+  // Вспомогательная функция: добавить часы к ISO-строке даты
+  const addHours = (isoStr: string, hours: number): string => {
+    const d = new Date(isoStr);
+    d.setTime(d.getTime() + hours * 60 * 60 * 1000);
+    return d.toISOString();
+  };
+
+  // Описания agenda для каждого события (индексы спикеров из массива speakers)
+  const agendaDefs: Array<{
+    eventIndex: number;
+    items: Array<{
+      title: string;
+      description: string;
+      offsetStartHours: number;
+      durationHours: number;
+      speakerIndices: number[];
+    }>;
+  }> = [
+    {
+      eventIndex: 0, // tech-meetup-spring-2026
+      items: [
+        {
+          title: 'Открытие. Архитектура высоконагруженных систем: опыт продакшена',
+          description:
+            'Иван Петров расскажет об архитектурных решениях при масштабировании сервисов до миллионов запросов в сутки: выбор между монолитом и микросервисами, подводные камни распределённых транзакций.',
+          offsetStartHours: 0,
+          durationHours: 1,
+          speakerIndices: [0],
+        },
+        {
+          title: 'DevOps-практика: CI/CD без боли и потерь',
+          description:
+            'Разбираем построение надёжного пайплайна: GitOps, канарейки, feature-флаги. Реальные кейсы из крупных российских IT-компаний.',
+          offsetStartHours: 1.25,
+          durationHours: 1,
+          speakerIndices: [0, 1],
+        },
+        {
+          title: 'Нетворкинг и Q&A-сессия',
+          description:
+            'Открытое общение с докладчиками, разбор вопросов из зала, демонстрация инструментов.',
+          offsetStartHours: 2.5,
+          durationHours: 1,
+          speakerIndices: [0, 1],
+        },
+      ],
+    },
+    {
+      eventIndex: 1, // product-conference-2026
+      items: [
+        {
+          title: 'Unit-экономика в условиях неопределённости',
+          description:
+            'Мария Смирнова — о том, как считать юнит-экономику, когда рынок нестабилен: ключевые метрики, антипаттерны и реальные формулы из запущенных продуктов.',
+          offsetStartHours: 0,
+          durationHours: 1,
+          speakerIndices: [1],
+        },
+        {
+          title: 'ML в продукте: от эксперимента до продакшена',
+          description:
+            'Алексей Кузнецов — практика внедрения рекомендательных систем и NLP-моделей в продукт без научного отдела: инструменты, метрики и типичные ошибки.',
+          offsetStartHours: 1.5,
+          durationHours: 1,
+          speakerIndices: [2],
+        },
+        {
+          title: 'Панельная дискуссия и нетворкинг',
+          description:
+            'Открытая панель: спикеры отвечают на вопросы аудитории, обсуждают тренды рынка и делятся инсайтами.',
+          offsetStartHours: 3,
+          durationHours: 1.5,
+          speakerIndices: [1, 2],
+        },
+      ],
+    },
+  ];
+
+  for (const agendaDef of agendaDefs) {
+    const event = createdEvents[agendaDef.eventIndex];
+    if (!event) continue;
+
+    // Получаем актуальный event с полем startsAt
+    const eventFull = await strapi
+      .documents('api::event.event')
+      .findFirst({ filters: { documentId: event.documentId } });
+
+    const eventStartsAt: string = eventFull?.startsAt ?? event.startsAt ?? new Date().toISOString();
+
+    for (const item of agendaDef.items) {
+      const itemStartsAt = addHours(eventStartsAt, item.offsetStartHours);
+      const itemEndsAt = addHours(eventStartsAt, item.offsetStartHours + item.durationHours);
+
+      // Идемпотентность: ищем по title + event
+      const existing = await strapi
+        .documents('api::agenda-item.agenda-item')
+        .findFirst({ filters: { title: item.title, event: { documentId: event.documentId } } });
+
+      if (existing) {
+        strapi.log.info(`seed: skipped agenda-item "${item.title}" for event "${event.slug ?? event.documentId}"`);
+        continue;
+      }
+
+      const itemSpeakers = item.speakerIndices.map((i: number) => speakers[i].documentId);
+
+      await strapi.documents('api::agenda-item.agenda-item').create({
+        data: {
+          title: item.title,
+          description: item.description,
+          startsAt: itemStartsAt,
+          endsAt: itemEndsAt,
+          event: event.documentId,
+          speakers: itemSpeakers,
+        },
+      });
+      strapi.log.info(`seed: created agenda-item "${item.title}" for event "${event.slug ?? event.documentId}"`);
+    }
+  }
+
   strapi.log.info('seed: dev seed complete');
 }
