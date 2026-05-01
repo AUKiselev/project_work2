@@ -24,6 +24,12 @@ apps/backend/build
 apps/backend/dist
 apps/backend/.tmp
 apps/backend/exports
+apps/backend/types/generated
+
+# playwright / qa artifacts
+apps/frontend/test-results/
+apps/frontend/playwright-report/
+apps/frontend/screenshot-*.png
 
 # capacitor / mobile
 apps/frontend/ios/App/Pods

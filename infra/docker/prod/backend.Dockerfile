@@ -1,6 +1,6 @@
 # Prod-образ Strapi 5.
 
-FROM node:22-alpine AS deps
+FROM node:24-alpine AS deps
 WORKDIR /opt/app
 RUN apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git > /dev/null 2>&1
 COPY package*.json ./
