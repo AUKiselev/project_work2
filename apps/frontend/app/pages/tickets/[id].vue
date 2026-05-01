@@ -9,9 +9,11 @@ const id = Number(route.params.id);
 const ticketsApi = useTickets();
 const { share } = useShare();
 
+// server: false — auth-only, на SSR токена нет.
 const { data: ticket, error } = await useAsyncData(
   () => `ticket-${id}`,
   () => ticketsApi.findOneMine(id),
+  { server: false },
 );
 
 if (error.value) {

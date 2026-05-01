@@ -4,10 +4,11 @@ import { useFavorites } from '~/composables/useFavorites';
 definePageMeta({ middleware: 'auth', layout: 'back' });
 
 const favsApi = useFavorites();
+// server: false — auth-only, на SSR токена нет.
 const { data: favs, pending, refresh } = await useAsyncData(
   'me-favorites',
   () => favsApi.listMine(),
-  { default: () => [] },
+  { default: () => [], server: false },
 );
 </script>
 

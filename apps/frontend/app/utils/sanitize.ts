@@ -1,5 +1,10 @@
 // Whitelist-санитизация richtext перед v-html.
-import DOMPurifyFactory from 'dompurify';
+//
+// isomorphic-dompurify — drop-in замена dompurify с поддержкой SSR
+// (на сервере использует jsdom, на клиенте — нативный DOMPurify),
+// поэтому одна и та же функция корректно работает и в Nitro/Nuxt SSR,
+// и в браузере, и в тестах (happy-dom/vitest).
+import DOMPurify from 'isomorphic-dompurify';
 
 const ALLOWED_TAGS = [
   'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
@@ -11,13 +16,9 @@ const ALLOWED_TAGS = [
 ];
 const ALLOWED_ATTR = ['href', 'src', 'alt', 'title', 'target', 'rel'];
 
-// DOMPurify требует window на момент вызова sanitize.
-// Передаём его явно, чтобы корректно работать как в браузере,
-// так и в тестовом окружении (happy-dom/vitest).
 export function sanitizeHtml(html: string): string {
   if (!html) return '';
-  const purify = DOMPurifyFactory(window as Window & typeof globalThis);
-  return purify.sanitize(html, {
+  return DOMPurify.sanitize(html, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
     KEEP_CONTENT: true,

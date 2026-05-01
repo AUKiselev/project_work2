@@ -4,7 +4,9 @@ import { useTickets } from '~/composables/useTickets';
 definePageMeta({ middleware: 'auth' });
 
 const ticketsApi = useTickets();
-const { data: tickets, pending } = await useAsyncData('my-tickets', () => ticketsApi.listMine(), { default: () => [] });
+// server: false — auth-стор гидратируется только на клиенте, на SSR
+// токена нет и /me/tickets вернёт 401. Грузим после mount.
+const { data: tickets, pending } = await useAsyncData('my-tickets', () => ticketsApi.listMine(), { default: () => [], server: false });
 
 const now = Date.now();
 const upcoming = computed(() => (tickets.value ?? []).filter((t) =>

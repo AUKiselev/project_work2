@@ -17,8 +17,15 @@ export default defineNuxtPlugin((nuxtApp) => {
     return refreshing;
   };
 
+  // На SSR бьём по внутреннему URL бэка (контейнер `backend`), так как
+  // публичный `api.localhost` внутри docker-сети не резолвится в Strapi.
+  // На клиенте оставляем публичный apiBase, который ходит через Traefik.
+  const baseURL = (import.meta.server && config.apiBaseServer)
+    ? config.apiBaseServer
+    : config.public.apiBase;
+
   const api = $fetch.create({
-    baseURL: config.public.apiBase,
+    baseURL,
     credentials: 'include',
     onRequest({ options }) {
       const auth = useAuthStore();

@@ -13,9 +13,11 @@ const id = Number(route.params.id);
 const orderApi = useOrder();
 const toast = useToast();
 
+// server: false — auth-only, на SSR токена нет.
 const { data: order, error, refresh } = await useAsyncData(
   () => `order-pay-${id}`,
   () => orderApi.findOneMine(id),
+  { server: false },
 );
 
 watch(order, (o) => {

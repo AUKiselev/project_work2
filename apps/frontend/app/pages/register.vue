@@ -43,15 +43,15 @@ const onSubmit = async () => {
       <h1 class="text-xl font-semibold">Создать аккаунт</h1>
     </template>
     <UForm :schema="schema" :state="state" class="space-y-3" @submit.prevent="onSubmit">
-      <UFormGroup label="Логин" name="username" required>
+      <UFormField label="Логин" name="username" required>
         <UInput v-model="state.username" autocomplete="username" />
-      </UFormGroup>
-      <UFormGroup label="Email" name="email" required>
+      </UFormField>
+      <UFormField label="Email" name="email" required>
         <UInput v-model="state.email" type="email" autocomplete="email" />
-      </UFormGroup>
-      <UFormGroup label="Пароль" name="password" required>
+      </UFormField>
+      <UFormField label="Пароль" name="password" required>
         <UInput v-model="state.password" type="password" autocomplete="new-password" />
-      </UFormGroup>
+      </UFormField>
       <UButton type="submit" block color="primary" :loading="pending">Создать аккаунт</UButton>
     </UForm>
     <template #footer>
