@@ -81,5 +81,10 @@ export default {
     }
     await grantPermissions(strapi, 'public', PUBLIC_ACTIONS);
     await grantPermissions(strapi, 'authenticated', AUTHENTICATED_ACTIONS);
+
+    if (process.env.SEED_DEV === 'true') {
+      const { seedDev } = await import('./seed/dev-seed');
+      await seedDev(strapi);
+    }
   },
 };
