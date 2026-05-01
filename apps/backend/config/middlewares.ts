@@ -4,7 +4,21 @@ const config: Core.Config.Middlewares = [
   'strapi::logger',
   'strapi::errors',
   'strapi::security',
-  'strapi::cors',
+  {
+    name: 'strapi::cors',
+    config: {
+      // Разрешённые Origin берём из WEB_ORIGINS (csv). Если переменная пуста —
+      // оставляем дефолт '*' (полезно при первом запуске без .env).
+      // Кастомный заголовок x-strapi-refresh-cookie нужен фронту,
+      // чтобы переключать транспорт refresh-токена в HttpOnly cookie.
+      origin: (() => {
+        const list = (process.env.WEB_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
+        return list.length ? list : '*';
+      })(),
+      credentials: true,
+      headers: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Strapi-Refresh-Cookie'],
+    },
+  },
   'strapi::poweredBy',
   'strapi::query',
   'strapi::body',
