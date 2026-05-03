@@ -33,13 +33,15 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <section class="px-4 py-4 space-y-4">
-    <h1 class="text-xl font-semibold">Связаться с менеджером</h1>
-    <UForm :schema="schema" :state="state" class="space-y-3" @submit.prevent="onSubmit">
-      <UFormGroup label="Тема" name="subject" required><UInput v-model="state.subject" /></UFormGroup>
-      <UFormGroup label="Сообщение" name="message" required><UTextarea v-model="state.message" :rows="5" /></UFormGroup>
-      <UFormGroup label="Как с вами связаться (телефон/email)" name="contactBack"><UInput v-model="state.contactBack" /></UFormGroup>
-      <UButton type="submit" block color="primary" :loading="pending">Отправить</UButton>
-    </UForm>
-  </section>
+  <AppDecorBackground variant="subtle">
+    <section class="px-4 py-4 space-y-4">
+      <h1 class="text-xl font-semibold">Связаться с менеджером</h1>
+      <UForm :schema="schema" :state="state" class="space-y-3" @submit.prevent="onSubmit">
+        <UFormGroup label="Тема" name="subject" required><UInput v-model="state.subject" /></UFormGroup>
+        <UFormGroup label="Сообщение" name="message" required><UTextarea v-model="state.message" :rows="5" /></UFormGroup>
+        <UFormGroup label="Как с вами связаться (телефон/email)" name="contactBack"><UInput v-model="state.contactBack" /></UFormGroup>
+        <UButton type="submit" block color="primary" :loading="pending">Отправить</UButton>
+      </UForm>
+    </section>
+  </AppDecorBackground>
 </template>

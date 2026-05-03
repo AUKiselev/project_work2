@@ -41,14 +41,16 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <section class="px-4 py-4 space-y-4">
-    <h1 class="text-xl font-semibold">Стать спикером</h1>
-    <UForm :schema="schema" :state="state" class="space-y-3" @submit.prevent="onSubmit">
-      <UFormGroup label="ФИО" name="fullName" required><UInput v-model="state.fullName" /></UFormGroup>
-      <UFormGroup label="Email" name="email" required><UInput v-model="state.email" type="email" /></UFormGroup>
-      <UFormGroup label="Тема выступления" name="topic"><UInput v-model="state.topic" /></UFormGroup>
-      <UFormGroup label="О чём хотите рассказать" name="description"><UTextarea v-model="state.description" :rows="5" /></UFormGroup>
-      <UButton type="submit" block color="primary" :loading="pending">Отправить заявку</UButton>
-    </UForm>
-  </section>
+  <AppDecorBackground variant="subtle">
+    <section class="px-4 py-4 space-y-4">
+      <h1 class="text-xl font-semibold">Стать спикером</h1>
+      <UForm :schema="schema" :state="state" class="space-y-3" @submit.prevent="onSubmit">
+        <UFormGroup label="ФИО" name="fullName" required><UInput v-model="state.fullName" /></UFormGroup>
+        <UFormGroup label="Email" name="email" required><UInput v-model="state.email" type="email" /></UFormGroup>
+        <UFormGroup label="Тема выступления" name="topic"><UInput v-model="state.topic" /></UFormGroup>
+        <UFormGroup label="О чём хотите рассказать" name="description"><UTextarea v-model="state.description" :rows="5" /></UFormGroup>
+        <UButton type="submit" block color="primary" :loading="pending">Отправить заявку</UButton>
+      </UForm>
+    </section>
+  </AppDecorBackground>
 </template>
