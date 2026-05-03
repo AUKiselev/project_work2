@@ -25,9 +25,9 @@ const past = computed(() => (tickets.value ?? []).filter((t) =>
     </div>
     <AppEmpty
       v-else-if="!tickets?.length"
-      icon="i-heroicons-ticket"
-      title="Билетов пока нет"
-      description="Купите билет — и он появится здесь."
+      illustration="tickets"
+      title="У вас ещё нет билетов"
+      description="Купите билет — он будет здесь с QR-кодом."
       cta-label="К мероприятиям"
       cta-to="/"
     />

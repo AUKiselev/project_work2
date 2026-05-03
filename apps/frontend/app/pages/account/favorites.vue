@@ -18,9 +18,9 @@ const { data: favs, pending, refresh } = await useAsyncData(
     <div v-if="pending" class="space-y-2"><EventCardSkeleton v-for="i in 2" :key="i" /></div>
     <AppEmpty
       v-else-if="!favs.length"
-      icon="i-heroicons-heart"
-      title="Пусто"
-      description="Отмечайте интересные мероприятия — они появятся здесь."
+      illustration="favorites"
+      title="Ничего в избранном"
+      description="Добавляйте интересные мероприятия — они появятся здесь."
       cta-label="К мероприятиям"
       cta-to="/"
     />

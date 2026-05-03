@@ -38,15 +38,15 @@ const { data: results, pending } = await useAsyncData(
     </div>
     <AppEmpty
       v-else-if="!q || q.trim().length < 2"
-      icon="i-heroicons-magnifying-glass"
+      illustration="search"
       title="Введите запрос"
       description="Минимум 2 символа."
     />
     <AppEmpty
       v-else-if="!results?.length"
-      icon="i-heroicons-magnifying-glass"
-      title="Ничего не найдено"
-      :description="`По запросу «${q}» нет мероприятий.`"
+      illustration="search"
+      title="Ничего не нашли"
+      :description="`По запросу «${q}» нет мероприятий. Попробуйте изменить запрос.`"
     />
     <div v-else class="space-y-2">
       <EventCardCompact v-for="e in results" :key="e.id" :event="e" />
