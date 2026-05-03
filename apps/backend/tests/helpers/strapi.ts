@@ -6,6 +6,8 @@ let instance: Core.Strapi | null = null;
 /** Set minimal env-vars required by Strapi config before boot. */
 const setTestEnv = () => {
   process.env.NODE_ENV = process.env.NODE_ENV ?? 'test';
+  // Use a dedicated test port to avoid conflicts with the running dev server (1337).
+  process.env.PORT = '13370';
   process.env.DATABASE_CLIENT = 'sqlite';
   process.env.DATABASE_FILENAME = '.tmp/test.db';
   process.env.APP_KEYS = process.env.APP_KEYS ?? 'testkey1,testkey2,testkey3,testkey4';
