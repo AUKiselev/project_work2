@@ -443,5 +443,54 @@ export async function seedDev(strapi: any): Promise<void> {
     }
   }
 
+  // ─── 10. Mock Tickets (для AvailabilityBadge) ─────────────────────────────
+
+  const MOCK_TICKETS_PLAN = [
+    { eventSlug: 'tech-meetup-spring-2026', count: 30 },
+    { eventSlug: 'product-conference-2026', count: 85 },
+  ];
+
+  for (const plan of MOCK_TICKETS_PLAN) {
+    const event = await strapi.documents('api::event.event').findFirst({
+      filters: { slug: plan.eventSlug },
+      populate: { tiers: true },
+      status: 'published',
+    });
+    if (!event) {
+      strapi.log.warn(`seed: mock-tickets ${plan.eventSlug}: event not found, skip`);
+      continue;
+    }
+    const existingCount = await strapi.db.query('api::ticket.ticket').count({
+      where: {
+        event: { documentId: event.documentId },
+        number: { $startsWith: `MOCK-${plan.eventSlug}-` },
+      },
+    });
+    if (existingCount >= plan.count) {
+      strapi.log.info(`seed: mock-tickets ${plan.eventSlug}: ${existingCount}/${plan.count} already present, skip`);
+      continue;
+    }
+    const tiers = ((event as any).tiers ?? []) as Array<{ documentId: string }>;
+    if (tiers.length === 0) {
+      strapi.log.warn(`seed: mock-tickets ${plan.eventSlug}: no tiers, skip`);
+      continue;
+    }
+    const toCreate = plan.count - existingCount;
+    for (let i = existingCount; i < plan.count; i++) {
+      const tier = tiers[i % tiers.length];
+      await strapi.documents('api::ticket.ticket').create({
+        data: {
+          number: `MOCK-${plan.eventSlug}-${i}`,
+          qrPayload: `mock-qr-${plan.eventSlug}-${i}`,
+          status: 'valid',
+          attendee: { fullName: `Гость ${i + 1}`, email: `guest${i}@example.com` },
+          event: event.documentId,
+          tier: tier.documentId,
+        },
+      });
+    }
+    strapi.log.info(`seed: mock-tickets ${plan.eventSlug}: created ${toCreate}`);
+  }
+
   strapi.log.info('seed: dev seed complete');
 }
