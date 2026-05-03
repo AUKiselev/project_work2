@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useEvents } from '~/composables/useEvents';
+import { useEventAvailability } from '~/composables/useEventAvailability';
 import { formatDateRange } from '~/utils/format';
 
 definePageMeta({ layout: 'back' });
@@ -22,6 +23,14 @@ const dateText = computed(() => event.value
   : '',
 );
 
+const { fetch: fetchAvailability, get: getAvailability } = useEventAvailability();
+watchEffect(() => {
+  if (event.value?.slug) fetchAvailability(event.value.slug);
+});
+const availability = computed(() =>
+  event.value?.slug ? getAvailability(event.value.slug) : undefined,
+);
+
 const onBuy = async () => {
   await navigateTo(`/events/${slug.value}/checkout`);
 };
@@ -29,7 +38,7 @@ const onBuy = async () => {
 
 <template>
   <div v-if="event" class="pb-24">
-    <EventHero :event="event" />
+    <EventHero :event="event" :availability="availability" />
 
     <div class="px-4 mt-4 space-y-6">
       <h1 class="text-2xl font-bold">{{ event.title }}</h1>

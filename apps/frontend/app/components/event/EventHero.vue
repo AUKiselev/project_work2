@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { Event } from '~/types/api';
 
-defineProps<{ event: Event }>();
+defineProps<{
+  event: Event;
+  availability?: { capacity: number; remaining: number } | null;
+}>();
 const route = useRoute();
 const fullUrl = computed(() => {
   const config = useRuntimeConfig();
@@ -21,6 +24,14 @@ const fullUrl = computed(() => {
     <div class="absolute top-3 right-3 flex items-center gap-2">
       <FavoriteToggle :event-id="event.id" />
       <AppShareButton :title="event.title" :url="fullUrl" />
+    </div>
+    <div class="absolute bottom-4 left-4 flex flex-wrap gap-2">
+      <CategoryBadge v-if="event.category" :category="event.category" />
+      <AvailabilityBadge
+        v-if="availability"
+        :capacity="availability.capacity"
+        :remaining="availability.remaining"
+      />
     </div>
   </div>
 </template>

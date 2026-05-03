@@ -21,6 +21,7 @@ const dateText = computed(() => formatDate(props.event.startsAt, props.event.tim
       />
     </div>
     <div class="flex-1 min-w-0 space-y-1">
+      <CategoryBadge v-if="event.category" :category="event.category" class="mb-1" />
       <h3 class="font-medium line-clamp-2">{{ event.title }}</h3>
       <p class="text-xs text-slate-400">{{ dateText }}</p>
       <p v-if="event.venue?.name" class="text-xs text-slate-500 truncate">
