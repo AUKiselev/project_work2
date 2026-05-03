@@ -38,6 +38,13 @@ describe('AvailabilityBadge', () => {
     expect(w.text()).toBe('');
   });
 
+  it('не рендерится при capacity = 0 (лимит не задан)', () => {
+    const w = mount(AvailabilityBadge, {
+      props: { capacity: 0, remaining: 50 },
+    });
+    expect(w.text()).toBe('');
+  });
+
   it('правильно склоняет: 1 место, 3 места, 5 мест', () => {
     const w1 = mount(AvailabilityBadge, { props: { capacity: 100, remaining: 1 } });
     expect(w1.text()).toContain('Осталось 1 место');

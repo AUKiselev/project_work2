@@ -4,7 +4,9 @@ import { computed } from 'vue';
 const props = defineProps<{ capacity: number; remaining: number }>();
 
 const ratio = computed(() => (props.capacity > 0 ? props.remaining / props.capacity : 0));
-const visible = computed(() => props.remaining > 0 && ratio.value <= 0.2);
+// capacity=0 = «лимит не задан» (бесплатные мероприятия, открытая продажа) —
+// бейдж в этом случае бессмыслен: «осталось N» из несуществующего пула.
+const visible = computed(() => props.capacity > 0 && props.remaining > 0 && ratio.value <= 0.2);
 
 const cls = computed(() =>
   ratio.value <= 0.1
