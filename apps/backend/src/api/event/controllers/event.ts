@@ -14,7 +14,7 @@ export default factories.createCoreController('api::event.event', ({ strapi }) =
         status: 'published',
         title: { $containsi: q },
       },
-      populate: { coverImage: true, venue: true, tiers: true },
+      populate: { coverImage: true, venue: true, tiers: true, category: true },
       sort: { startsAt: 'asc' },
       limit: 50,
       status: 'published',
@@ -38,6 +38,7 @@ export default factories.createCoreController('api::event.event', ({ strapi }) =
         agenda: { populate: { speakers: { populate: { photo: true } } } },
         speakers: { populate: { photo: true } },
         tiers: true,
+        category: true,
       },
       status: 'published',
     });
