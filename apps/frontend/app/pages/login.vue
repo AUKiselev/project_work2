@@ -48,8 +48,16 @@ const onSubmit = async () => {
       <UButton type="submit" block color="primary" :loading="pending">Войти</UButton>
     </UForm>
     <template #footer>
-      <p class="text-sm text-slate-400">
-        Нет аккаунта? <NuxtLink to="/register" class="text-indigo-400">Зарегистрироваться</NuxtLink>
+      <div class="my-4 flex items-center gap-3">
+        <div class="h-px flex-1 bg-slate-800" />
+        <span class="text-xs text-slate-500">или</span>
+        <div class="h-px flex-1 bg-slate-800" />
+      </div>
+      <UButton to="/register" variant="ghost" color="primary" block>
+        Создать аккаунт
+      </UButton>
+      <p class="mt-2 text-center text-xs text-slate-500">
+        Регистрация по email
       </p>
     </template>
   </UCard>
