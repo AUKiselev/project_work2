@@ -117,18 +117,9 @@ Routes — стандартный `createCoreRouter`. В `apps/backend/src/index
 
 ### Источник «sold»
 
-Финальный источник определяется в плане после inspection схем `Ticket` и
-`Order`. Вероятный путь:
-
-- если у `Ticket` есть атрибут `status` со значениями включая `paid` —
-  агрегируем напрямую: `count(tickets WHERE tier.event = X AND status IN
-  ('paid', 'used'))`;
-- иначе через `order_items WHERE order.status = 'paid' AND tier.event = X`,
-  считая `quantity`.
-
-В обоих случаях используем Strapi 5 `strapi.db.query(...).count()` или
-`strapi.documents(...).findMany()` + `.length` (зависит от того, где удобнее
-выразить условие). Финальная формулировка фиксируется в плане.
+Через прямой `event` FK у `Ticket` со status valid|used (выпущенные и
+использованные билеты, занимающие capacity; refunded/cancelled освобождают
+место). Enum значений: `valid | used | refunded | cancelled`.
 
 ### Endpoint
 
@@ -159,8 +150,8 @@ async availability(ctx: any) {
 
   const sold = await strapi.db.query('api::ticket.ticket').count({
     where: {
-      tier: { event: { documentId: event.documentId } },
-      status: { $in: ['paid', 'used'] },
+      event: { documentId: event.documentId },
+      status: { $in: ['valid', 'used'] },
     },
   });
 

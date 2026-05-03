@@ -64,11 +64,46 @@ describe('Event availability API', () => {
     }
 
     const res = await request(strapi.server.httpServer).get(`/api/events/${event.slug}/availability`);
+    expect(res.status).toBe(200);
     expect(res.body.data).toEqual({ capacity: 5, sold: 3, remaining: 2 });
   });
 
   it('возвращает 404 для несуществующего slug', async () => {
     const res = await request(strapi.server.httpServer).get('/api/events/nonexistent-slug-xyz/availability');
     expect(res.status).toBe(404);
+  });
+
+  it('возвращает 404 для draft event (не published)', async () => {
+    const slug = `avail-draft-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    await strapi.documents('api::event.event').create({
+      data: {
+        title: 'Avail Draft',
+        slug,
+        startsAt: new Date().toISOString(),
+        capacity: 10,
+        status: 'draft',
+      },
+    });
+
+    const res = await request(strapi.server.httpServer).get(`/api/events/${slug}/availability`);
+    expect(res.status).toBe(404);
+  });
+
+  it('возвращает capacity:0 / remaining:0 для event без указанного capacity', async () => {
+    const slug = `avail-nocap-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const event = await strapi.documents('api::event.event').create({
+      data: {
+        title: 'No Capacity',
+        slug,
+        startsAt: new Date().toISOString(),
+        // capacity не указан — Event.capacity опционален в schema
+        status: 'published',
+      },
+      status: 'published',
+    });
+
+    const res = await request(strapi.server.httpServer).get(`/api/events/${event.slug}/availability`);
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual({ capacity: 0, sold: 0, remaining: 0 });
   });
 });
