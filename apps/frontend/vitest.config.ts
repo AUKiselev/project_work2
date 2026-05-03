@@ -25,6 +25,8 @@ export default defineConfig({
     alias: {
       '~': fileURLToPath(new URL('./app', import.meta.url)),
       '@': fileURLToPath(new URL('./app', import.meta.url)),
+      // Нужен для vi.mock('#app', ...) в unit-тестах composables.
+      '#app': fileURLToPath(new URL('./node_modules/nuxt/dist/app/index.js', import.meta.url)),
     },
   },
 });
