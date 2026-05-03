@@ -9,7 +9,7 @@ interface ListParams {
   filters?: Record<string, unknown>;
 }
 
-const POPULATE_LIST = ['coverImage', 'organizer.logo', 'tiers'];
+const POPULATE_LIST = ['coverImage', 'organizer.logo', 'tiers', 'category', 'venue'];
 const POPULATE_DETAIL = [
   'coverImage', 'gallery', 'pastGallery',
   'venue', 'organizer.logo',

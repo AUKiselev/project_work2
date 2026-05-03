@@ -75,6 +75,14 @@ export interface TicketTier {
 
 export type EventStatus = 'draft' | 'published' | 'cancelled' | 'archived';
 
+export interface Category {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  colorToken?: 'primary' | 'sky' | 'emerald' | 'amber' | 'rose' | 'violet';
+}
+
 export interface Event {
   id: number;
   documentId: string;
@@ -95,6 +103,7 @@ export interface Event {
   speakers?: Speaker[];
   agenda?: AgendaItem[];
   tiers?: TicketTier[];
+  category?: Category | null;
 }
 
 export interface Banner {

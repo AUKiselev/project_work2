@@ -1,12 +1,26 @@
 <script setup lang="ts">
+import { watch } from 'vue';
 import { useEvents } from '~/composables/useEvents';
 import { useBanners } from '~/composables/useBanners';
+import { useEventAvailability } from '~/composables/useEventAvailability';
 
 const eventsApi = useEvents();
 const bannersApi = useBanners();
+const { fetch: fetchAvailability, get: getAvailability } = useEventAvailability();
 
 const { data: banners, pending: bannersPending } = await useAsyncData('home-banners', () => bannersApi.list(), { default: () => [] });
 const { data: events, pending: eventsPending, error: eventsError, refresh } = await useAsyncData('home-events', () => eventsApi.list({ pageSize: 20 }), { default: () => [] });
+
+watch(
+  () => events.value,
+  (list) => {
+    if (!list) return;
+    for (const e of list) {
+      fetchAvailability(e.slug);
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -31,7 +45,12 @@ const { data: events, pending: eventsPending, error: eventsError, refresh } = aw
       description="Загляните позже — мы публикуем новые анонсы регулярно."
     />
     <div v-else class="grid gap-4 sm:grid-cols-2">
-      <EventCard v-for="e in events" :key="e.id" :event="e" />
+      <EventCard
+        v-for="e in events"
+        :key="e.id"
+        :event="e"
+        :availability="getAvailability(e.slug)"
+      />
     </div>
   </section>
 </template>
