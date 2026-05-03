@@ -33,5 +33,15 @@ describe('Category public API', () => {
     expect(res.status).toBe(200);
     expect(res.body.data.title).toBe('Test Cat');
     expect(res.body.data.colorToken).toBe('sky');
+    expect(res.body.data.slug).toBe(slug);
+  });
+
+  it('отклоняет создание категории с невалидным colorToken', async () => {
+    const slug = `bad-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    await expect(
+      strapi.documents('api::category.category').create({
+        data: { title: 'Bad Color', slug, colorToken: 'crimson' as any },
+      }),
+    ).rejects.toThrow();
   });
 });

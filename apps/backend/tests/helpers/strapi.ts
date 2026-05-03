@@ -7,7 +7,8 @@ let instance: Core.Strapi | null = null;
 const setTestEnv = () => {
   process.env.NODE_ENV = process.env.NODE_ENV ?? 'test';
   // Use a dedicated test port to avoid conflicts with the running dev server (1337).
-  process.env.PORT = '13370';
+  // TEST_PORT allows CI-matrix / parallel sessions to override without inheriting the dev-server PORT.
+  process.env.PORT = process.env.TEST_PORT ?? '13370';
   process.env.DATABASE_CLIENT = 'sqlite';
   process.env.DATABASE_FILENAME = '.tmp/test.db';
   process.env.APP_KEYS = process.env.APP_KEYS ?? 'testkey1,testkey2,testkey3,testkey4';
