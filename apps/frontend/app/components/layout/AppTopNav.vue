@@ -21,8 +21,7 @@ const onLogout = async () => {
         <UButton size="xs" color="gray" variant="soft" @click="onLogout">Выйти</UButton>
       </template>
       <template v-else>
-        <NuxtLink to="/login" class="hover:text-white">Войти</NuxtLink>
-        <NuxtLink to="/register" class="hover:text-white">Регистрация</NuxtLink>
+        <UButton to="/login" color="primary" variant="solid" size="sm">Войти</UButton>
       </template>
     </nav>
   </header>
