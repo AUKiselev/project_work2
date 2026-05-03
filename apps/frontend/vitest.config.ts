@@ -15,10 +15,7 @@ export default defineConfig({
     },
     globals: true,
     include: ['tests/unit/**/*.{spec,test}.ts'],
-    // TODO: восстановить sanitize.spec.ts — failing из-за isomorphic-dompurify
-    // CJS/ESM конфликта в vitest happy-dom окружении. Не блокер для polish-фичи,
-    // т.к. сам isomorphic-dompurify работает в SSR и e2e (проверено в smoke).
-    exclude: ['node_modules/**', 'dist/**', 'tests/unit/sanitize.spec.ts'],
+    exclude: ['node_modules/**', 'dist/**'],
     coverage: { provider: 'v8', reporter: ['text', 'html'] },
   },
   resolve: {
