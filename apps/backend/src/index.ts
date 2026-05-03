@@ -9,6 +9,7 @@ const PUBLIC_ACTIONS = [
   'api::event.event.findOne',
   'api::event.event.search',
   'api::event.event.findBySlug',
+  'api::event.event.availability',
   'api::speaker.speaker.find',
   'api::speaker.speaker.findOne',
   'api::organizer.organizer.find',

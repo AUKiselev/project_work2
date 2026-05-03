@@ -46,4 +46,23 @@ export default factories.createCoreController('api::event.event', ({ strapi }) =
     const sanitized = await this.sanitizeOutput(event, ctx);
     ctx.body = { data: sanitized };
   },
+
+  async availability(ctx: any) {
+    const slug = String(ctx.params.slug);
+    const event = await strapi.documents('api::event.event').findFirst({
+      filters: { slug },
+      status: 'published',
+    });
+    if (!event) return ctx.notFound();
+
+    const sold = await strapi.db.query('api::ticket.ticket').count({
+      where: {
+        event: { documentId: event.documentId },
+        status: { $in: ['valid', 'used'] },
+      },
+    });
+
+    const capacity = event.capacity ?? 0;
+    ctx.body = { data: { capacity, sold, remaining: Math.max(0, capacity - sold) } };
+  },
 }));

@@ -25,6 +25,11 @@ export default {
     },
     {
       method: 'GET',
+      path: '/events/:slug/availability',
+      handler: 'api::event.event.availability',
+    },
+    {
+      method: 'GET',
       path: '/events/:id',
       handler: 'api::event.event.findOne',
     },
