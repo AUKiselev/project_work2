@@ -114,12 +114,42 @@ export async function seedDev(strapi: any): Promise<void> {
     speakers.push(speaker);
   }
 
-  // ─── 4. Events ─────────────────────────────────────────────────────────────
+  // ─── 4. Categories ─────────────────────────────────────────────────────────
+
+  const categorySeedDefs = [
+    { slug: 'meetup', title: 'Митап', colorToken: 'sky' as const },
+    { slug: 'conference', title: 'Конференция', colorToken: 'primary' as const },
+    { slug: 'workshop', title: 'Воркшоп', colorToken: 'emerald' as const },
+    { slug: 'lecture', title: 'Лекция', colorToken: 'violet' as const },
+  ];
+
+  const categoriesBySlug: Record<string, { documentId: string }> = {};
+
+  for (const seed of categorySeedDefs) {
+    const existingCategory = await strapi
+      .documents('api::category.category')
+      .findFirst({ filters: { slug: seed.slug } });
+
+    if (existingCategory) {
+      strapi.log.info(`seed: skipped category "${seed.slug}" (exists)`);
+      categoriesBySlug[seed.slug] = { documentId: existingCategory.documentId };
+    } else {
+      const created = await strapi.documents('api::category.category').create({
+        data: seed,
+        status: 'published',
+      });
+      strapi.log.info(`seed: created category "${seed.slug}"`);
+      categoriesBySlug[seed.slug] = { documentId: created.documentId };
+    }
+  }
+
+  // ─── 5. Events ─────────────────────────────────────────────────────────────
 
   const eventDefs = [
     {
       slug: 'tech-meetup-spring-2026',
       title: 'Tech Meetup: Весна 2026',
+      categorySlug: 'meetup',
       shortDescription:
         'Весенний митап для разработчиков и архитекторов: высоконагруженные системы, современные инструменты, живые кейсы из продакшена.',
       description:
@@ -134,6 +164,7 @@ export async function seedDev(strapi: any): Promise<void> {
     {
       slug: 'product-conference-2026',
       title: 'Product Conference 2026',
+      categorySlug: 'conference',
       shortDescription:
         'Конференция для продакт-менеджеров и лидеров роста: стратегия, метрики, команды и реальный опыт запуска продуктов.',
       description:
@@ -150,12 +181,25 @@ export async function seedDev(strapi: any): Promise<void> {
   const createdEvents: any[] = [];
 
   for (const def of eventDefs) {
+    const categoryDocumentId = def.categorySlug ? categoriesBySlug[def.categorySlug]?.documentId : undefined;
+
+    // Читаем published-версию (она видна через публичный API)
     let event = await strapi
       .documents('api::event.event')
-      .findFirst({ filters: { slug: def.slug } });
+      .findFirst({ filters: { slug: def.slug }, populate: { category: true }, status: 'published' });
 
     if (event) {
       strapi.log.info(`seed: skipped event "${def.title}"`);
+      // Привязываем категорию к уже существующему event'у, если она ещё не задана в published-версии
+      if (categoryDocumentId && !(event as any).category) {
+        // update с status: 'published' обновляет напрямую опубликованную версию
+        await strapi.documents('api::event.event').update({
+          documentId: event.documentId,
+          data: { category: categoryDocumentId },
+          status: 'published',
+        });
+        strapi.log.info(`seed: event "${def.slug}" attached to category "${def.categorySlug}"`);
+      }
     } else {
       const eventSpeakers = def.speakerIndices.map((i: number) => speakers[i].documentId);
 
@@ -173,6 +217,7 @@ export async function seedDev(strapi: any): Promise<void> {
           venue: venue.documentId,
           organizer: organizer.documentId,
           speakers: eventSpeakers,
+          ...(categoryDocumentId ? { category: categoryDocumentId } : {}),
         },
         status: 'published',
       });
@@ -182,7 +227,7 @@ export async function seedDev(strapi: any): Promise<void> {
     createdEvents.push(event);
   }
 
-  // ─── 5. Ticket Tiers ───────────────────────────────────────────────────────
+  // ─── 6. Ticket Tiers ───────────────────────────────────────────────────────
 
   const tierDefs = [
     { name: 'Стандарт', price: 1500, sortOrder: 1, description: 'Доступ на все доклады, кофе-пауза, электронные материалы.' },
@@ -214,7 +259,7 @@ export async function seedDev(strapi: any): Promise<void> {
     }
   }
 
-  // ─── 6. Banner ─────────────────────────────────────────────────────────────
+  // ─── 7. Banner ─────────────────────────────────────────────────────────────
 
   let banner = await strapi
     .documents('api::banner.banner')
@@ -251,7 +296,7 @@ export async function seedDev(strapi: any): Promise<void> {
     }
   }
 
-  // ─── 7. Promo Code ─────────────────────────────────────────────────────────
+  // ─── 8. Promo Code ─────────────────────────────────────────────────────────
 
   let promo = await strapi
     .documents('api::promo-code.promo-code')
@@ -277,7 +322,7 @@ export async function seedDev(strapi: any): Promise<void> {
     strapi.log.info('seed: created promo-code "WELCOME10"');
   }
 
-  // ─── 8. Agenda Items ───────────────────────────────────────────────────────
+  // ─── 9. Agenda Items ───────────────────────────────────────────────────────
 
   // Вспомогательная функция: добавить часы к ISO-строке даты
   const addHours = (isoStr: string, hours: number): string => {
