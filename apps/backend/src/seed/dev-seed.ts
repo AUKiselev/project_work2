@@ -476,6 +476,9 @@ export async function seedDev(strapi: any): Promise<void> {
       continue;
     }
     const toCreate = plan.count - existingCount;
+    // Допущение: предыдущие билеты имеют последовательные индексы 0..existingCount-1.
+    // Если кто-то вручную удалит билет из середины — цикл попытается создать
+    // дубликат и упадёт на unique-constraint номера. Допустимо для dev-сидера.
     for (let i = existingCount; i < plan.count; i++) {
       const tier = tiers[i % tiers.length];
       await strapi.documents('api::ticket.ticket').create({
