@@ -134,9 +134,9 @@ export async function seedDev(strapi: any): Promise<void> {
       strapi.log.info(`seed: skipped category "${seed.slug}" (exists)`);
       categoriesBySlug[seed.slug] = { documentId: existingCategory.documentId };
     } else {
+      // Category — single-version (draftAndPublish: false), опция status здесь не нужна.
       const created = await strapi.documents('api::category.category').create({
         data: seed,
-        status: 'published',
       });
       strapi.log.info(`seed: created category "${seed.slug}"`);
       categoriesBySlug[seed.slug] = { documentId: created.documentId };
