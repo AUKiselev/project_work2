@@ -19,6 +19,8 @@ const PUBLIC_ACTIONS = [
   'api::venue.venue.findOne',
   'api::agenda-item.agenda-item.find',
   'api::agenda-item.agenda-item.findOne',
+  'api::category.category.find',
+  'api::category.category.findOne',
   'api::banner.banner.find',
   'api::speaker-application.speaker-application.create',
   'api::manager-contact-request.manager-contact-request.create',
