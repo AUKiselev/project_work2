@@ -1,7 +1,7 @@
 # Prod-образ Nuxt 4: сборка и запуск Node-сервера Nitro.
 # На этапе генерации приложения Nuxt CLI положит сюда package.json и исходники.
 
-FROM node:22-alpine AS deps
+FROM node:24-alpine AS deps
 WORKDIR /opt/app
 COPY package*.json ./
 RUN npm ci

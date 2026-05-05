@@ -66,6 +66,11 @@
       "relation": "oneToMany",
       "target": "api::ticket-tier.ticket-tier",
       "mappedBy": "event"
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category"
     }
   }
 }

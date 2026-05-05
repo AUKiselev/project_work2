@@ -9,20 +9,30 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@vueuse/nuxt',
     '@vite-pwa/nuxt',
+    '@nuxt/ui',
   ],
+
+  // Авто-импорт компонентов без префикса по имени директории: компоненты
+  // уже именованы доменно (App*, Event*, Banner*…), поэтому LayoutAppTopNav
+  // нам не нужен — используем как <AppTopNav/>.
+  components: [{ path: '~/components', pathPrefix: false }],
 
   // Tailwind v4 — единственный CSS-entrypoint импортирует @tailwindcss.
   css: ['~/assets/css/app.css'],
 
   // Маппинг env -> runtimeConfig: NUXT_PUBLIC_* идут в public, остальные приватные.
   // Значения подставляются из переменных окружения, заданных Docker Compose.
+  // apiBaseServer — внутрисетевой URL бэка для SSR-фетчей (например,
+  // http://backend:1337/api). В браузере ходим по public.apiBase через Traefik.
   runtimeConfig: {
     apiSecret: '',
+    apiBaseServer: '',
     public: {
       siteUrl: '',
       apiBase: '',
       // Имя refresh-cookie на бэке (зеркалит UP_REFRESH_COOKIE_NAME).
       refreshCookieName: 'strapi_up_refresh',
+      appEnv: '',
     },
   },
 
@@ -81,10 +91,27 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
     server: {
-      // Разрешаем HMR через Traefik (host = app.localhost) и при разработке через LAN.
+      // HMR-сервер внутри контейнера слушает на 0.0.0.0:24678, порт пробрасывается
+      // в compose. Браузер коннектится к ws://<host>:24678 — работает и через
+      // localhost:3000, и через Traefik (app.localhost), т.к. порт публичный.
       hmr: {
+        protocol: 'ws',
+        host: 'localhost',
+        port: 24678,
         clientPort: 24678,
       },
+    },
+    optimizeDeps: {
+      // Pre-bundle, чтобы dev-сервер не перезагружал страницу при первом импорте.
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+        '@capacitor/preferences',
+        '@aparajita/capacitor-secure-storage',
+        '@capacitor/core',
+        'uuid',
+        'isomorphic-dompurify',
+      ],
     },
   },
 });

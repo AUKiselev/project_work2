@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "categories",
+  "info": {
+    "singularName": "category",
+    "pluralName": "categories",
+    "displayName": "Category",
+    "description": "Категория мероприятия"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "slug": { "type": "uid", "targetField": "title", "required": true },
+    "title": { "type": "string", "required": true, "maxLength": 80 },
+    "colorToken": {
+      "type": "enumeration",
+      "enum": ["primary", "sky", "emerald", "amber", "rose", "violet"],
+      "default": "primary",
+      "required": true
+    },
+    "description": { "type": "text", "required": false }
+  }
+}

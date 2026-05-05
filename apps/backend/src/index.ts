@@ -1,14 +1,27 @@
 import type { Core } from '@strapi/strapi';
 
+// `find/findOne` на связанных типах (ticket-tier/venue/agenda-item) нужен,
+// чтобы Strapi sanitizeOutput не вырезал их из populate-ответа на /api/events.
+// Сами CRUD-роуты на /api/ticket-tiers и т.п. остаются доступными для public —
+// это допустимо, т.к. клиент всё равно ходит к ним только в составе события.
 const PUBLIC_ACTIONS = [
   'api::event.event.find',
   'api::event.event.findOne',
   'api::event.event.search',
   'api::event.event.findBySlug',
+  'api::event.event.availability',
   'api::speaker.speaker.find',
   'api::speaker.speaker.findOne',
   'api::organizer.organizer.find',
   'api::organizer.organizer.findOne',
+  'api::ticket-tier.ticket-tier.find',
+  'api::ticket-tier.ticket-tier.findOne',
+  'api::venue.venue.find',
+  'api::venue.venue.findOne',
+  'api::agenda-item.agenda-item.find',
+  'api::agenda-item.agenda-item.findOne',
+  'api::category.category.find',
+  'api::category.category.findOne',
   'api::banner.banner.find',
   'api::speaker-application.speaker-application.create',
   'api::manager-contact-request.manager-contact-request.create',
@@ -81,5 +94,10 @@ export default {
     }
     await grantPermissions(strapi, 'public', PUBLIC_ACTIONS);
     await grantPermissions(strapi, 'authenticated', AUTHENTICATED_ACTIONS);
+
+    if (process.env.SEED_DEV === 'true') {
+      const { seedDev } = await import('./seed/dev-seed');
+      await seedDev(strapi);
+    }
   },
 };

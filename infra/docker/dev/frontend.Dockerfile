@@ -2,7 +2,7 @@
 # Анонимный volume на /opt/app/node_modules в compose сохранит установленные
 # пакеты при бинд-маунте host-директории поверх /opt/app.
 
-FROM node:22-alpine
+FROM node:24-alpine
 WORKDIR /opt/app
 ENV HOST=0.0.0.0
 ENV PORT=3000

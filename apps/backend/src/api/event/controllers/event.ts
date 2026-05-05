@@ -7,24 +7,28 @@ export default factories.createCoreController('api::event.event', ({ strapi }) =
       ctx.body = { data: [] };
       return;
     }
-    const rows = await strapi.db.query('api::event.event').findMany({
-      where: {
-        publishedAt: { $notNull: true },
+    // Используем Document Service (не strapi.db.query) чтобы sanitizeOutput
+    // корректно обрабатывал relations в document-формате Strapi 5.
+    const results = await strapi.documents('api::event.event').findMany({
+      filters: {
         status: 'published',
         title: { $containsi: q },
       },
-      populate: { coverImage: true, venue: true, tiers: true },
-      orderBy: { startsAt: 'asc' },
+      populate: { coverImage: true, venue: true, tiers: true, category: true },
+      sort: { startsAt: 'asc' },
       limit: 50,
+      status: 'published',
     });
-    const sanitized = await this.sanitizeOutput(rows, ctx);
+    const sanitized = await this.sanitizeOutput(results, ctx);
     ctx.body = { data: sanitized };
   },
 
   async findBySlug(ctx: any) {
     const slug = String(ctx.params.slug);
-    const event = await strapi.db.query('api::event.event').findOne({
-      where: { slug, publishedAt: { $notNull: true }, status: 'published' },
+    // Document Service корректно обрабатывается sanitizeOutput в Strapi 5.
+    // strapi.db.query возвращает entity-формат без documentId, что ломает sanitize.
+    const event = await strapi.documents('api::event.event').findFirst({
+      filters: { slug },
       populate: {
         coverImage: true,
         gallery: true,
@@ -34,10 +38,31 @@ export default factories.createCoreController('api::event.event', ({ strapi }) =
         agenda: { populate: { speakers: { populate: { photo: true } } } },
         speakers: { populate: { photo: true } },
         tiers: true,
+        category: true,
       },
+      status: 'published',
     });
     if (!event) return ctx.notFound();
     const sanitized = await this.sanitizeOutput(event, ctx);
     ctx.body = { data: sanitized };
+  },
+
+  async availability(ctx: any) {
+    const slug = String(ctx.params.slug);
+    const event = await strapi.documents('api::event.event').findFirst({
+      filters: { slug },
+      status: 'published',
+    });
+    if (!event) return ctx.notFound();
+
+    const sold = await strapi.db.query('api::ticket.ticket').count({
+      where: {
+        event: { documentId: event.documentId },
+        status: { $in: ['valid', 'used'] },
+      },
+    });
+
+    const capacity = event.capacity ?? 0;
+    ctx.body = { data: { capacity, sold, remaining: Math.max(0, capacity - sold) } };
   },
 }));

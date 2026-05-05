@@ -1,34 +1,36 @@
 <script setup lang="ts">
+import { z } from 'zod';
 import { useAuthStore } from '~/stores/auth';
+import { parseStrapiError } from '~/utils/api';
 
-definePageMeta({ middleware: 'guest' });
+definePageMeta({ middleware: 'guest', layout: 'auth' });
 
 const auth = useAuthStore();
 const router = useRouter();
+const toast = useToast();
 
-const username = ref('');
-const email = ref('');
-const password = ref('');
+const schema = z.object({
+  username: z.string().min(3, 'Минимум 3 символа'),
+  email: z.string().email('Неверный email'),
+  password: z.string().min(6, 'Минимум 6 символов'),
+});
+
+const state = reactive({ username: '', email: '', password: '' });
 const pending = ref(false);
-const errorMsg = ref<string | null>(null);
 
 const onSubmit = async () => {
-  errorMsg.value = null;
   pending.value = true;
   try {
-    const res = await auth.register({
-      username: username.value,
-      email: email.value,
-      password: password.value,
-    });
-    // Если включено email-confirmation, jwt не выдаётся — отправляем на /login.
+    const res = await auth.register({ username: state.username, email: state.email, password: state.password });
     if (!res.jwt) {
+      toast.add({ color: 'green', title: 'Подтвердите email', description: 'На вашу почту отправлено письмо' });
       await router.push('/login');
     } else {
       await router.push('/');
     }
-  } catch (err: any) {
-    errorMsg.value = err?.data?.error?.message || 'Registration failed';
+  } catch (err) {
+    const parsed = parseStrapiError(err);
+    toast.add({ color: 'red', title: 'Не удалось зарегистрироваться', description: parsed.message });
   } finally {
     pending.value = false;
   }
@@ -36,42 +38,26 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <section class="max-w-md mx-auto space-y-4">
-    <h1 class="text-2xl font-bold">Create account</h1>
-    <form class="space-y-3" @submit.prevent="onSubmit">
-      <input
-        v-model="username"
-        type="text"
-        placeholder="Username"
-        autocomplete="username"
-        required
-        class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-800"
-      />
-      <input
-        v-model="email"
-        type="email"
-        placeholder="Email"
-        autocomplete="email"
-        required
-        class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-800"
-      />
-      <input
-        v-model="password"
-        type="password"
-        placeholder="Password"
-        autocomplete="new-password"
-        required
-        minlength="6"
-        class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-800"
-      />
-      <button
-        type="submit"
-        :disabled="pending"
-        class="w-full px-3 py-2 rounded bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50"
-      >
-        {{ pending ? 'Creating…' : 'Create account' }}
-      </button>
-    </form>
-    <p v-if="errorMsg" class="text-red-400 text-sm">{{ errorMsg }}</p>
-  </section>
+  <UCard>
+    <template #header>
+      <h1 class="text-xl font-semibold">Создать аккаунт</h1>
+    </template>
+    <UForm :schema="schema" :state="state" class="space-y-3" @submit.prevent="onSubmit">
+      <UFormField label="Логин" name="username" required>
+        <UInput v-model="state.username" autocomplete="username" />
+      </UFormField>
+      <UFormField label="Email" name="email" required>
+        <UInput v-model="state.email" type="email" autocomplete="email" />
+      </UFormField>
+      <UFormField label="Пароль" name="password" required>
+        <UInput v-model="state.password" type="password" autocomplete="new-password" />
+      </UFormField>
+      <UButton type="submit" block color="primary" :loading="pending">Создать аккаунт</UButton>
+    </UForm>
+    <template #footer>
+      <p class="text-sm text-slate-400">
+        Уже есть аккаунт? <NuxtLink to="/login" class="text-indigo-400">Войти</NuxtLink>
+      </p>
+    </template>
+  </UCard>
 </template>

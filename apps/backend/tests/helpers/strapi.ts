@@ -6,6 +6,12 @@ let instance: Core.Strapi | null = null;
 /** Set minimal env-vars required by Strapi config before boot. */
 const setTestEnv = () => {
   process.env.NODE_ENV = process.env.NODE_ENV ?? 'test';
+  // PORT=0 заставляет ОС назначить случайный свободный порт при listen() —
+  // никаких коллизий с dev-сервером, никаких хардкодов, безопасно для CI-параллелизма.
+  // supertest всё равно общается с http-сервером напрямую через handler,
+  // так что фактический порт не важен — нужен только успешный bind.
+  // TEST_PORT по-прежнему работает как override, если зачем-то нужен фиксированный порт.
+  process.env.PORT = process.env.TEST_PORT ?? '0';
   process.env.DATABASE_CLIENT = 'sqlite';
   process.env.DATABASE_FILENAME = '.tmp/test.db';
   process.env.APP_KEYS = process.env.APP_KEYS ?? 'testkey1,testkey2,testkey3,testkey4';
